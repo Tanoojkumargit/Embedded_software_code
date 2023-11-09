@@ -1,0 +1,40 @@
+#pragma config OSC    = HS        
+#pragma config WDT    = OFF         
+#pragma config PBADEN = OFF         
+#pragma config MCLRE  = ON          
+#include <p18f4520.h>              
+#include <delays.h>                
+
+void main(void)                  
+{  
+	LATB=0x03;   // LAT is for Initilizing the value of digital pin                              
+    LATD  = 0x00;  
+    TRISD = 0x00;    // TIRSD is for Declaring the input or output operation of pin
+	TRISBbits.RB4=0;
+	TRISBbits.RB5=0;
+	;
+	while(1)
+	{
+   if(PORTBbits.RB0==1)   // PORTB.bits.RB0 is for digital read of input pin              
+    {                              
+      LATDbits.LATD0=1; // Making the digital pin HIGH
+	  LATBbits.LATB4=1;		
+    } 
+	else
+{
+LATDbits.LATD0=0;
+	LATBbits.LATB4=0;
+}
+if(PORTBbits.RB1==1)                       
+   {                              
+     LATDbits.LATD7=1;
+	 LATBbits.LATB5=1; 	
+    } 
+else
+{
+
+    LATDbits.LATD7=0;
+	LATBbits.LATB5=0;
+}	
+}
+}
