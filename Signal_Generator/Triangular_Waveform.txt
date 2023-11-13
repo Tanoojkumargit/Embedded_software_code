@@ -1,0 +1,50 @@
+#include<p18f4520.h> // Device selected
+#pragma config OSC = HS //set osc mode to HS
+#pragma config WDT=OFF //Watch Dog Timer disabled
+#pragma config LVP=OFF //Low Voltage Programming option OFF
+#pragma config MCLRE = ON //Master Clear Pin ON
+// Include the folowing headers
+#include <p18f4520.h> // Device used is the PICF4520
+#include <stdlib.h> // Include standard Library
+#include <delays.h> // Include Delays
+#define CS PORTBbits.RB4 // Port bit B0 is used as the Chip Select pin CS
+void DAC(unsigned int);
+unsigned int a,b;
+void main()
+{
+TRISB=0; // PORTB is configured as an output port for CS
+TRISC=0; // PORTC is configured as an output port for SPI
+PORTC=0; // Initialise Ports
+PORTB=0; // ""
+SSPSTAT=0xC0; //Status Register SSPSTAT=11000000
+SSPCON1=0x20; //Enables serial port pins & set the SPI clock as clock = FOSC/4
+while(1)
+ {
+    
+	 for(a=0; a<255;a++)	 
+	 DAC(a); // 0V
+    //Delay1KTCYx(10); // Delay
+	 for(b=255; b>0; b--)
+     DAC(b);
+    //Delay1KTCYx(10); // Delay
+}
+}
+
+
+void DAC(unsigned int data)
+{
+ unsigned int c ;
+ unsigned int lower_bits;
+ unsigned int upper_bits;
+ c = ((data+1)*16) -1; // here we obtain 12 bit data //first obtain the upper 8 bits
+ upper_bits = c/256; // obtain the upper 4 bits
+ upper_bits = (48) | upper_bits; // append 0011 to the above 4 bits
+ //now obtain the lower 8 bits
+ lower_bits = 255 & c; // ANDing separates the lower 8 bits
+ CS=0; // Chip Select RB0 Low
+ SSPBUF=upper_bits; // sending the upper 8 bits first serially
+ while(!SSPSTATbits.BF); // wait until the upper 8 bits are sent by checking BF flag
+ SSPBUF=lower_bits; // sending the lower 8 bits serially
+ while(!SSPSTATbits.BF); // wait until the lower 8 bits are sent
+ CS=1; // Chip Select ONE
+} 

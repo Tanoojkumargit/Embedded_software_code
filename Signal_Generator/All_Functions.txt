@@ -1,0 +1,115 @@
+void triangle_wave()
+{
+     for(a=0; a<255;a++)
+		 
+	 DAC(a); // 0V
+	 
+	
+	 for(b=255; b>0; b--)
+     DAC(b);
+}
+void ramp_down()
+{
+	 DAC(255); // 0V
+	 for(b=255; b>0; b--)
+     DAC(0);
+ }
+ 
+ void ramp_up()
+ 
+ {
+	
+	 for(a=0; a<255;a++)	 
+     DAC(a);
+	 DAC(0);
+   
+ }
+ 
+
+  void sine()
+{
+    static unsigned int j = 0; // Initialize j
+    if (j >= 100)
+    {
+        j = 0;
+    }
+    a = sin_wave[j];
+    DAC(a);
+    j++;
+}
+
+
+-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0--------
+
+#include <p18f4520.h>
+#include <timers.h>
+#include <stdlib.h>
+#include <delays.h>
+
+#pragma config OSC = HS
+#pragma config WDT = OFF
+#pragma config LVP = OFF
+#pragma config MCLRE = ON
+
+#define CS PORTBbits.RB4
+
+void DAC(unsigned int);
+
+const unsigned char sin_wave[100] = {127, 135, 143, 151, 159, 166, 174, 181, 195, 202, 208, 214, 220, 225, 230, 234, 238, 242, 245, 248, 250, 252, 253, 254, 254, 253, 252, 250, 248, 245, 242, 238, 234, 230, 225, 220, 214, 208, 202, 195, 188, 181, 174, 166, 159, 151, 143, 135, 127, 119, 111, 103, 95, 88, 80, 73, 66, 59, 52, 46, 40, 34, 29, 24, 20, 16, 12, 9, 6, 4, 2, 1, 0, 0, 0, 1, 2, 4, 6, 9, 12, 16, 20, 24, 29, 34, 40, 46, 52, 59, 66, 73, 80, 88, 95, 103, 111, 119};
+
+void triangle_wave()
+{
+    for (j = 0; j < 100; j++)
+    {
+        a = sin_wave[j];
+        DAC(a);
+        WriteTimer0(0);
+        while (ReadTimer0() < 9765);
+    }
+
+    for (j = 99; j > 0; j--)
+    {
+        a = sin_wave[j];
+        DAC(a);
+        WriteTimer0(0);
+        while (ReadTimer0() < 9765);
+    }
+}
+
+void main()
+{
+    TRISB = 0;
+    TRISC = 0;
+    PORTC = 0;
+    PORTB = 0;
+    SSPSTAT = 0xC0;
+    SSPCON1 = 0x20;
+
+    OpenTimer0(
+        TIMER_INT_OFF &
+        T0_16BIT &
+        T0_SOURCE_INT &
+        T0_PS_1_256);
+
+    while (1)
+    {
+        triangle_wave(); // Generate triangle wave
+    }
+}
+
+void DAC(unsigned int data)
+{
+    unsigned int c;
+    unsigned int lower_bits;
+    unsigned int upper_bits;
+    c = ((data + 1) * 16) - 1;
+    upper_bits = c / 256;
+    upper_bits = (48) | upper_bits;
+    lower_bits = 255 & c;
+    CS = 0;
+    SSPBUF = upper_bits;
+    while (!SSPSTATbits.BF);
+    SSPBUF = lower_bits;
+    while (!SSPSTATbits.BF);
+    CS = 1;
+}

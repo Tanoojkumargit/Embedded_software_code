@@ -1,0 +1,192 @@
+#pragma config OSC = HS // HS oscillator
+#pragma config WDT = OFF // Watchdog timer off
+#pragma config MCLRE = ON // Master clear reset On
+//#pragma config DEBUG = OFF // Debug off
+#pragma config LVP = OFF // Low voltage programming off
+
+
+#include<timers.h>
+#include <p18f4520.h>
+#include <delays.h>
+
+#define CS PORTBbits.RB4 // Port bit B4 for Chip select
+void DAC(unsigned int);
+void INT0_ISR(void);
+volatile unsigned int interruptCount = 0;
+unsigned int a,b,j;
+const unsigned char sin_wave[100]={127,135,143,151,159,166,174,181,195,202,208,214,220,225,230,234,238,242,245,248,250,252,253,254,254,253,252,250,248,245,242,238,234,230,225,220,214,208,202,195,188,1811,174,16,159,151,143,135,127,119,111,103,95,88,80,73,66,59,52,46,40,34,29,24,20,16,12,9,6,4,2,1,0,0,0,1,2,4,6,9,12,16,20,24,29,34,40,46,52,59,66,73,80,88,95,103,111,119};
+
+
+
+
+#pragma code high_vector = 0x08
+void interrupt_at_high_vector(void) {
+    _asm
+    GOTO INT0_ISR
+    _endasm
+}
+
+#pragma code
+#pragma interruptlow INT0_ISR
+
+void main(void) {
+    ADCON1 = 0x0F;  
+    TRISB=0;	
+    //TRISD = 0x00;     
+   // LATD = 0x00;     
+
+    INTCONbits.INT0IE = 1; // Enable INT0 interrupts
+    INTCONbits.INT0IF = 0; // Clear INT0 Interrupt flag
+    INTCONbits.GIE = 1;
+
+SSPSTAT=0xC0; //Status Register SSPSTAT=11000000
+SSPCON1=0x20; //Enables serial port pins & set the SPI clock as clock = FOSC/4
+    
+    while(1)
+	
+	{		            
+      //  WriteTimer0(0); 
+      //  DAC(0);	                 
+      //  while(ReadTimer0() < 9765);                 
+        		                       
+      //  WriteTimer0(0); 
+      //  DAC(255); 	              
+       // while(ReadTimer0() < 9765);                      
+        
+	
+		}  
+
+  
+
+   
+     
+}
+
+void DAC(unsigned int data)
+{
+ unsigned int c ;
+ unsigned int lower_bits;
+ unsigned int upper_bits;
+ c = ((data+1)*16) -1; // here we obtain 12 bit data //first obtain the upper 8 bits
+ upper_bits = c/256; // obtain the upper 4 bits
+ upper_bits = (48) | upper_bits; // append 0011 to the above 4 bits
+ //now obtain the lower 8 bits
+ lower_bits = 255 & c; // ANDing separates the lower 8 bits
+ CS=0; // Chip Select RB0 Low
+ SSPBUF=upper_bits; // sending the upper 8 bits first serially
+ while(!SSPSTATbits.BF); // wait until the upper 8 bits are sent by checking BF flag
+ SSPBUF=lower_bits; // sending the lower 8 bits serially
+ while(!SSPSTATbits.BF); // wait until the lower 8 bits are sent
+ CS=1; // Chip Select ONE
+} 
+
+void triangle_wave()
+{
+     for(a=0; a<255;a++)	 
+	 DAC(a); // 0V
+	 for(b=255; b>0; b--)
+     DAC(b);
+}
+void ramp_down()
+{
+	 DAC(255); // 0V
+	 for(b=255; b>0; b--)
+     DAC(0);
+ }
+ 
+ void ramp_up()
+ 
+ {
+	
+	 for(a=0; a<255;a++)	 
+     DAC(a);
+	  DAC(0);
+    //Delay1KTCYx(10); // Delay
+ }
+ 
+ void sine()
+ {
+	 j++;
+      if (j >= 180)
+      {
+         j = 0;
+      }
+      a = sin_wave[j];
+      DAC(a);
+  }
+  
+
+
+
+void INT0_ISR(void) {
+	
+	
+    INTCONbits.INT0IE = 0; // Disable INT0 interrupts
+    TRISD=0X00;	// Clear Port D
+    Delay10KTCYx(10);     // Delay for a while so results can be seen
+    INTCONbits.INT0IE = 1; // Re-enable INT0 interrupts
+    INTCONbits.INT0IF = 0; // Clear INT0 flag before returning to the main program
+
+    interruptCount++; // Increment interrupt count variable
+    if (interruptCount >= 5) {
+        interruptCount = 0; // Reset the counter if it reaches 6
+    }
+
+
+    switch (interruptCount) {
+        case 1:
+		{
+			LATD=0x00;                 //Sine wave Function
+		    LATDbits.LATD0=1;
+			//void sine();
+			
+		}
+           
+            break;
+        case 2:                              // Square wave function
+		{
+			LATD=0x00;
+			LATDbits.LATD1=1;
+			
+		}
+           
+            break;
+        
+		case 3:
+		{
+		    LATD=0x00;
+			LATDbits.LATD2=1;
+			//void triangle_wave();
+
+		}
+		  break;
+		
+		case 4:
+		{
+			LATD=0x00;
+			LATDbits.LATD3=1;
+		}
+		  break;
+		case 5:
+		{
+			LATD=0x00;
+			LATDbits.LATD4=1;
+			//void ramp_up();
+		}
+		  break;
+		case 6:
+		{
+			LATDbits.LATD5=1;
+			//void ramp_down();
+		}
+		  break;
+
+        default:
+			{
+	
+			LATD=0x00;
+		}
+            
+            break;
+    }
+}

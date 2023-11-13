@@ -1,0 +1,72 @@
+#pragma config OSC = HS // HS oscillator
+#pragma config WDT = OFF // Watcdog timer off
+#pragma config MCLRE = ON // Master clear reset On
+#pragma config DEBUG = OFF // Debug off
+#pragma config LVP = OFF // Low voltage programming off
+/* ------- Include the following header files ------ */
+#include<p18f4520.h> // header files of PIC18F4520
+#include<delays.h> // include delays
+#include <portb.h> // Header files required for port B interrupts
+void test_isr (void); //
+void INT0_ISR(void) ; //Prototype for the goto that follows
+#pragma code my_interrupt = 0x08 //High Interrupt vector @ 0x08
+void my_interrupt (void) // At loc 0x08 we place the assembler instruction GOTO
+ {
+_asm // This is the assembly code at vector location
+GOTO test_isr
+_endasm
+ }
+17
+#pragma code // used to allow linker to locate remaining code
+/* ----- Bellow we test for the source of the interrupt ---- */
+#pragma interrupt test_isr
+void test_isr (void)
+{
+if (INTCONbits.INT0IF == 1) // Was interrupt caused by INT0 ?
+INT0_ISR (); // Yes , execute INT0 program
+ }
+void main (void)
+{
+ADCON1 =0x0F; // Set Ports as Digital I/O rather than analogue
+TRISD = 0x00; // Make Port D all output
+LATD = 0x00; // Clear Port D
+/* ------ One other way in setting Interrupts could be the following ----------
+OpenRB0INT (PORTB_CHANGE_INT_ON & PORTB_PULLUPS_ON & FALLING_EDGE_INT);
+however from a detaild point view we will break this down to the individual
+register settings as shown bellow. See appendix for further details */
+INTCONbits.INT0IE = 1; //Enable INT0 interrupts
+INTCONbits.INT0IF = 0; // Clear INT0 Interrupt flag
+INTCONbits.GIE = 1; // Enable global interrupts
+while (1) // Repeat for ever until interrupted
+{
+LATD++; // Increment PORT D
+Delay10KTCYx(200); // Call delay function
+ }
+}
+/* ----- Interrupt routine INT0_ISR follows bellow: ---- */
+void INT0_ISR (void) // This is the interrupt service routine
+{
+INTCONbits.INT0IE = 0; // Disable any interrupt within interrupts
+LATD = 0X00; // Clear Port D
+Delay10KTCYx(400); // Delay for a while so results can be seen
+INTCONbits.INT0IE = 1; // Re-enable INT0 interrupts
+INTCONbits.INT0IF = 0; // Clear INT0 flag before returning to main program
+ }
+18
+Exercise 2.
+Modify MCC18 C version of Example 1 so that your main code shows a left shifted display on Port D
+(starting with D0). On an interrupt on RB0 your interrupt service routine should change the shifting
+to the right (starting with Port Bit D7) until all 8 bits have been fully shifted.
+Exercise 3.
+Exercise 3 will use two interrupting inputs INT0 and INT1. Note that INT0 is a high priority interrupt.
+INT1 would be configured as a low priority interrupt.
+The main routine should count on Port D as in our previous example.
+Using two of the switches on the switch outboard write a program in MCC18 or assembly that will
+interrupt the main routine.
+The ISR for INT0 should clear Port D with the appropriate time delay.
+ISR for INT1 should flash all Port D LEDs twice with the appropriate time delay. On return from
+interrupts the system resumes the counting routine.
+For further help see interrupt code template (pages 15-16).
+Refer to the circuit diagram of Fig. 9 for system connections.
+Exercise 1
+Modify the C version of ex

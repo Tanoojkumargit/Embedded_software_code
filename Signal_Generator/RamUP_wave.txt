@@ -1,0 +1,62 @@
+#include <p18f4520.h>
+#include <timers.h>
+#include <stdlib.h>
+#include <delays.h>
+#pragma config OSC = HS
+#pragma config WDT = OFF
+#pragma config LVP = OFF
+#pragma config MCLRE = ON
+
+#define CS PORTBbits.RB4
+void ramp_up();
+void DAC(unsigned int);
+
+void ramp_up()
+{
+    unsigned int a; // Declare variable 'a'
+    
+    for (a = 0; a < 256; a++)
+    {
+        DAC(a);
+        WriteTimer0(0);
+        while (ReadTimer0() < 100);
+    }
+}
+
+void main()
+{
+    TRISB = 0;
+TRISC=0; 
+    PORTC=0; 
+    SSPSTAT=0xC0; //Status Register SSPSTAT=11000000
+    SSPCON1=0x20; //Enables serial port pins & set the SPI clock as clock = FOSC/4
+   
+
+    OpenTimer0(
+        TIMER_INT_OFF &
+        T0_16BIT &
+        T0_SOURCE_INT &
+        T0_PS_1_256);
+
+    while (1)
+    {
+        ramp_up(); // Generate sawtooth ramp-up signal
+    }
+}
+
+void DAC(unsigned int data)
+{
+    unsigned int c;
+    unsigned int lower_bits;
+    unsigned int upper_bits;
+    c = ((data + 1) * 16) - 1;
+    upper_bits = c / 256;
+    upper_bits = (48) | upper_bits;
+    lower_bits = 255 & c;
+    CS = 0;
+    SSPBUF = upper_bits;
+    while (!SSPSTATbits.BF);
+    SSPBUF = lower_bits;
+    while (!SSPSTATbits.BF);
+    CS = 1;
+}
