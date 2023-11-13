@@ -4,7 +4,6 @@
   <PLACEMENT>2c0000000200000003000000ffffffffffffffffffffffffffffffffbc00000028000000ca0600000c040000</PLACEMENT>
   <WINDOW type="default" module="ISIS"/>
   <WINDOW type="default" module="VSMSTUDIO">
-   <FILE NAME=""/>
    <FILE NAME="C:/Users/tanoo/OneDrive/Desktop/Signal_Generator/PIC18F4520/main.c"/>
    <FILE NAME="C:/Users/tanoo/OneDrive/Desktop/Signal_Generator/PIC18F4520/interupt.h"/>
    <STATE NAME="EDIT" VALUE="AAAA/wAAAAH9AAAAAgAAAAAAAADIAAACi/wCAAAAAfsAAAAQAFAAcgBvAGoAZQBjAHQAcwEAAAAAAAACiwAAASwA////AAAAAwAAB3gAAADa/AEAAAAB+wAAACAATwB1AHQAcAB1AHQARABvAGMAawBXAGkAZABnAGUAdAEAAAAAAAAHeAAAAFcA////AAAGqwAAAosAAAAEAAAABAAAAAgAAAAI/AAAAAA="/>
@@ -15,7 +14,7 @@
   <PWI>
    <POPUP w="400" x="4" flags="00000002" y="118" h="100" pid="0" iid="-1">
     <PROPERTIES>
-     <ITEM name="Message Column Width">160</ITEM>
+     <ITEM name="Message Column Width">281</ITEM>
      <ITEM name="ShowGrid">No</ITEM>
      <ITEM name="Source Column Width">100</ITEM>
      <ITEM name="Time Column Width">120</ITEM>
