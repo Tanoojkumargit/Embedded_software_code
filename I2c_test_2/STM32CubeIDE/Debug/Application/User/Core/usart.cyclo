@@ -1,0 +1,4 @@
+D:/STM_Cube_MX/I2c_test_2/Core/Src/usart.c:11:6:MX_USART1_UART_Init	2
+D:/STM_Cube_MX/I2c_test_2/Core/Src/usart.c:32:6:MX_USART3_UART_Init	2
+D:/STM_Cube_MX/I2c_test_2/Core/Src/usart.c:52:6:HAL_UART_MspInit	3
+D:/STM_Cube_MX/I2c_test_2/Core/Src/usart.c:111:6:HAL_UART_MspDeInit	3

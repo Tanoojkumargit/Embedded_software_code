@@ -1,0 +1,4 @@
+D:/STM_Cube_MX/I2c_test_2/Core/Src/adc.c:31:6:MX_ADC1_Init	3
+D:/STM_Cube_MX/I2c_test_2/Core/Src/adc.c:78:6:MX_ADC2_Init	3
+D:/STM_Cube_MX/I2c_test_2/Core/Src/adc.c:125:6:HAL_ADC_MspInit	3
+D:/STM_Cube_MX/I2c_test_2/Core/Src/adc.c:177:6:HAL_ADC_MspDeInit	3

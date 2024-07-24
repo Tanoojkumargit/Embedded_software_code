@@ -1,0 +1,4 @@
+../Core/Src/rtc.c:7:6:RTC_SetTime	1
+../Core/Src/rtc.c:15:6:RTC_SetDate	1
+../Core/Src/rtc.c:23:6:RTC_GetTime	1
+../Core/Src/rtc.c:31:6:RTC_GetDate	1

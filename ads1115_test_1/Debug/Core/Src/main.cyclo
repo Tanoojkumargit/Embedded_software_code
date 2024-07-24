@@ -1,0 +1,5 @@
+../Core/Src/main.c:35:7:calculate_average	2
+../Core/Src/main.c:47:5:main	2
+../Core/Src/main.c:91:9:read_ads1115	4
+../Core/Src/main.c:126:6:SystemClock_Config	3
+../Core/Src/main.c:160:6:Error_Handler	1

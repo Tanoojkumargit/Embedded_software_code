@@ -1,0 +1,10 @@
+../Core/Src/main.c:45:5:_write	24	static
+../Core/Src/main.c:50:10:Read_ADC	8	static
+../Core/Src/main.c:58:6:sort_array	32	static
+../Core/Src/main.c:70:7:median_filter	16	static
+../Core/Src/main.c:79:7:running_average_filter	24	static
+../Core/Src/main.c:87:7:Convert_ADC_to_Voltage	24	static
+../Core/Src/main.c:101:6:FloatToString	48	static
+../Core/Src/main.c:107:5:main	944	static
+../Core/Src/main.c:147:6:SystemClock_Config	88	static
+../Core/Src/main.c:181:6:Error_Handler	4	static,ignoring_inline_asm
